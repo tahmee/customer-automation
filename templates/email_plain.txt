@@ -1,0 +1,19 @@
+MINDFUEL
+    STRENGTH STARTS FROM THE MIND
+    DAILY QUOTE TO KEEP YOU GOING
+
+    Hi {{ recipient_name }},
+
+    Here's something to get your day started.
+
+    "{{ quote }}"
+    - {{ author }}
+
+    Best Regards,
+    MindFuel
+
+    MindFuel
+    Suite 123, 123 Anywhere Street,
+    Any City, ST 12345
+
+    You're receiving this email because you signed up for upda
