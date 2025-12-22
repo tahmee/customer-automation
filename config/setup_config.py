@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Setup api_ingest directories
+# Setup directories and file paths
 LOG_DIR = "logs"
 OUTPUT_DIR = "api_data"
 
@@ -19,7 +19,7 @@ OUTPUT_PATH = os.path.join(OUTPUT_DIR, "quote_data.json")
 
 
 class EmailConfig:
-    # SMTP credentials/ DB config
+    # SMTP credentials
     SENDER_EMAIL = os.getenv('SENDER_EMAIL')
     SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
     SMTP_SERVER = os.getenv('SMTP_SERVER')
@@ -28,11 +28,10 @@ class EmailConfig:
 
 
 class AppConfig:  
-    # Set database credentials and file path
-    DB_CREDENTIALS = os.getenv('DB_CREDENTIALS')
+    DB_CREDENTIALS = os.getenv('DB_CREDENTIALS')  # DB credentials
     FILE_PATH = os.getenv('FILE_PATH') # Path to quotes file
 
-    # Paths to use in your main scripts
+    # process, main script and summary log file path
     LOG_PATH = MAIN_LOG_PATH 
     SUMMARY_LOG_PATH = SUMMARY_LOG_PATH
     
@@ -65,7 +64,7 @@ def logging_setup(log_path, module_name):
         # Add handler to logger
         logger.addHandler(file_handler)
         
-        # Prevent propagation to root logger (avoids duplicate logs)
+        # Prevent propagation to root logger 
         logger.propagate = False
 
     return logger
