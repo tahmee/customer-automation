@@ -3,10 +3,10 @@ import json
 import os
 from dotenv import load_dotenv 
 from datetime import datetime
-from config.setup_config import logging_setup, LOG_PATH, OUTPUT_PATH, zq_today_api
+from config.setup_config import logging_setup, API_LOG_PATH, OUTPUT_PATH
 
 # logging config
-logger = logging_setup(LOG_PATH, __name__)
+logger = logging_setup(API_LOG_PATH, __name__)
 
 load_dotenv()
 
