@@ -1,10 +1,15 @@
 import logging
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 # Setup api_ingest directories
 LOG_DIR = "logs"
 OUTPUT_DIR = "api_data"
+
+os.makedirs(LOG_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 API_LOG_PATH = os.path.join(LOG_DIR, "api_ingest.log")
 MAIN_LOG_PATH = os.path.join(LOG_DIR, "process.log")
@@ -18,7 +23,7 @@ class EmailConfig:
     SENDER_EMAIL = os.getenv('SENDER_EMAIL')
     SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
     SMTP_SERVER = os.getenv('SMTP_SERVER')
-    SMTP_PORT = int(os.getenv('SMTP_PORT'))
+    SMTP_PORT = int(os.getenv('SMTP_PORT', 587))
     SMTP_TIMEOUT = int(os.getenv('SMTP_TIMEOUT'))
 
 
@@ -32,6 +37,7 @@ class AppConfig:
     SUMMARY_LOG_PATH = SUMMARY_LOG_PATH
     
     # Alert email configuration
+    SENDER_EMAIL = os.getenv('ALERT')
     ALERT_EMAIL = os.getenv('ALERT_EMAIL') 
     SEND_ALERTS = os.getenv('SEND_ALERTS').lower() == 'true'
 
