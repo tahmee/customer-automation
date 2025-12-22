@@ -49,7 +49,7 @@ def email_template(recipient_name, quote, author):
         return None
     
 
-def send_email_config(user_name, user_email, quote, author, sender_name='MindFuel', subject = "Inspiration from MindFuel", max_retries=MAX_RETRIES):
+def send_email(user_name, user_email, quote, author, sender_name='MindFuel', subject = "Inspiration from MindFuel", max_retries=MAX_RETRIES):
     """Send email with max retry in place."""
     for attempt in range(1, max_retries + 1):
         try:
@@ -76,22 +76,14 @@ def send_email_config(user_name, user_email, quote, author, sender_name='MindFue
              
                 logger.info(f'Email sent successfully {user_name}, {user_email} on attempt {attempt}!')
             return True
-        except smtplib.SMTPException as e:
+        except (smtplib.SMTPException, Exception) as e:
             logger.warning(f'SMTP error sending to {user_email} (attempt {attempt}/{max_retries}): {e}')
+
             if attempt < max_retries:
                 sleep_time = RETRY_DELAY * (2 ** (attempt - 1))
                 time.sleep(sleep_time)
             else:
                 logger.error(f'Failed to send email to {user_email} after {max_retries} attempts')
-                raise
+                return False
             
-        except Exception as e:
-            logger.error(f'Unexpected error sending to {user_email} (attempt {attempt}/{max_retries}): {e}')
-            if attempt < max_retries:
-                sleep_time = RETRY_DELAY * (2 ** (attempt - 1))
-                time.sleep(sleep_time)   
-            else:
-                logger.error(f'Failed to send email to {user_email} after {max_retries} attempts')
-                raise
-        
     return False
