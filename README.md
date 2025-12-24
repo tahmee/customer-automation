@@ -22,7 +22,7 @@ This project is a robust Python-based email automation system for MindFuel (a me
 1. **Quote Ingestion** (`api_ingest.py`): Fetch daily inspirational quotes from the [ZenQuotes API](https://docs.zenquotes.io/zenquotes-documentation/) and cache them locally.
   - **The exact API endpoint used is `https://zenquotes.io/api/today/[your_key]`** with key being optional.
 2. **User Retrieval** (`process.py`): Fetch users records from a database based off their subscription frequency (i.e daily/weekly).
-3. **Email Distribution** (`process.py`): Send personalised emails to subscribers with the day's quote, supporting both daily and weekly delivery schedules.
+3. **Email Distribution** (`email_utils.py`): Sends personalised emails to subscribers with the day's quote, supporting both daily and weekly delivery schedules.
 
 ## System Architecture Diagram
 <img width="2387" height="1555" alt="img1" src="https://github.com/user-attachments/assets/3f4d1cba-387d-429e-b7e3-e0a9c5205b54" />
@@ -31,21 +31,37 @@ This project is a robust Python-based email automation system for MindFuel (a me
 
 ```
 customer-automation/
-├── api_ingest.py          # Quote fetching script
-├── process.py             # Email distribution script
-├── requirements.txt       # Python dependencies
-├── .env                   # Environment variables (create this)
-├── README.md             # This file
-│
 ├── api_data/             # Quote cache directory
 │   └── quote_data.json   # Today's quote (auto-generated)
 │
-├── logs/                 # Log files directory
+|── config/                
+    └── setup_config.py   # system's config file
+|
+├── logs/                 
 │   ├── api_ingest.log    # API interaction logs
-│   ├── process.log       # Email sending detailed logs
+│   ├── process.log       # Other process and main logic logs
 │   └── summary.log       # Execution statistics
 │
-└── venv/                 # Virtual environment (create this)
+|── src/
+|   ├── alerts.py         # alerting system for monitoring
+│   ├── api_ingest.py     # Api ingestion script
+│   ├── db_conn.py        # database interaction
+|   ├── email_utils.py    # Email config
+│   ├── process.py        # Users processing
+|   └── summary_log.py    # Summary logs config
+│  
+|── templates/
+|   ├── alert_email.html    # Alerting email template
+│   ├── email_plain.txt      # Plain email text (backup)
+│   └── email.html         # Main email template
+|
+|── venv/                 # Virtual environment (create this)
+|
+├── fetch_quote.py          # Quote fetching script
+├── main.py               # Email distribution script
+├── requirements.txt       # Project dependencies
+├── .env                   # Environment variables (create this)
+└── README.md             # This file
 ```
 
 ## Prerequisites
@@ -59,7 +75,7 @@ customer-automation/
 ## Project Workflow
 
 ### Quote Ingestion (API)
-- Connect to ZenQuotes Api using the today API endpoint, fetch the daily quote and saves into a local JSON file (`quote_data.json`)
+- Connect to ZenQuotes Api using the today API endpoint, fetch the daily quote and save into a local JSON file (`quote_data.json`)
   - A mechanism is in place to ensure a new api connection is not made (based off the timezone used for quotes being refreshed at the API endpoint) and to rely on the cached quote. This mechanism is in place to accomodate different timezone (for this implementation the `process.py` file will have to be modified.)
 
 ### ETL process (Email Delivery)
