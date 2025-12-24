@@ -7,7 +7,6 @@ from config.setup_config import logging_setup, AppConfig
 
 
 logger=logging_setup(AppConfig.LOG_PATH, __name__)
-CHECKPOINT_FILE = "api_data/pipeline_checkpoint.json"
 CHUNK_SIZE = 1000
 
 
@@ -29,16 +28,16 @@ def initialize_engine():
 
 
 def get_last_processed_id():
-    if os.path.exists(CHECKPOINT_FILE):
+    if os.path.exists(AppConfig.CHECKPOINT_FILE):
         try:
-            with open(CHECKPOINT_FILE, 'r') as f:
+            with open(AppConfig.CHECKPOINT_FILE, 'r') as f:
                 return json.load(f).get('max_id', 0)
         except Exception: return 0
     return 0
 
 
 def save_checkpoint(last_id):
-    with open(CHECKPOINT_FILE, 'w') as f:
+    with open(AppConfig.CHECKPOINT_FILE, 'w') as f:
         json.dump({'max_id': last_id, 'updated_at': str(datetime.now())}, f)
 
 
