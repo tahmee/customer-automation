@@ -30,6 +30,7 @@ class EmailConfig:
 class AppConfig:  
     DB_CREDENTIALS = os.getenv('DB_CREDENTIALS')  # DB credentials
     FILE_PATH = os.getenv('FILE_PATH') # Path to quotes file
+    CHECKPOINT_FILE = "api_data/pipeline_checkpoint.json"
 
     # process, main script and summary log file path
     LOG_PATH = MAIN_LOG_PATH 
