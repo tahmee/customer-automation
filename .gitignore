@@ -1,6 +1,9 @@
 # Local files
 logs/
 api_data/
+test.py
+reset.py
+create.sql
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
