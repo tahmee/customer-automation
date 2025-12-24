@@ -1,64 +1,90 @@
+import json
+import os
 from datetime import datetime
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from config.setup_config import logging_setup, AppConfig
 
-logger=logging_setup(AppConfig.LOG_PATH, __name__)
 
+logger=logging_setup(AppConfig.LOG_PATH, __name__)
+CHECKPOINT_FILE = "api_data/pipeline_checkpoint.json"
 CHUNK_SIZE = 1000
 
-# Create database engine
-try:
-    logger.info("====== BEGIN EMAIL AUTOMATION SCRIPT ======")
-    engine = create_engine(AppConfig.DB_CREDENTIALS, pool_pre_ping=True)
-    Session = sessionmaker(bind=engine)
-    logger.info("Database engine created successfully")
-except Exception as e:
-    logger.error(f"Failed to create database engine: {e}")
-    raise
+
+engine = None
+Session = sessionmaker()
+
+
+def initialize_engine():
+    # Create database engine
+    global engine, Session
+    try:
+        logger.info(f"=== INITIALIZING DATABASE ENGINE ===")
+        engine = create_engine(AppConfig.DB_CREDENTIALS, pool_pre_ping=True)
+        Session.configure(bind=engine)
+        logger.info("Database engine created successfully")
+    except Exception as e:
+        logger.critical(f"Failed: Could not establish database connection: {e}")
+        raise 
+
+
+def get_last_processed_id():
+    if os.path.exists(CHECKPOINT_FILE):
+        try:
+            with open(CHECKPOINT_FILE, 'r') as f:
+                return json.load(f).get('max_id', 0)
+        except Exception: return 0
+    return 0
+
+
+def save_checkpoint(last_id):
+    with open(CHECKPOINT_FILE, 'w') as f:
+        json.dump({'max_id': last_id, 'updated_at': str(datetime.now())}, f)
 
 
 def fetch_users_in_batches(email_frequency, batch_size=CHUNK_SIZE):
     """
     Fetch users in batches from database.
     """
-    total_fetched = 0
+    last_id = get_last_processed_id()
     
-    with Session() as session:
-        while True:
-            try:
-                query = text("""
-                    SELECT user_id, first_name, email_address
-                    FROM users
-                    WHERE subscription_status = 'active'
-                        AND email_frequency = :frequency
-                        AND (last_email_sent_at < CURRENT_DATE OR last_email_sent_at IS NULL)
-                    ORDER BY user_id ASC
-                    LIMIT :limit;
-                """)
+    try:
+        with Session() as session:
+            while True:
+                    query = text("""
+                        SELECT user_id, first_name, email_address
+                        FROM users
+                        WHERE subscription_status = 'active'
+                            AND email_frequency = :frequency
+                            AND user_id > :last_id
+                            AND (last_email_sent_at < CURRENT_DATE OR last_email_sent_at IS NULL)
+                        ORDER BY user_id ASC
+                        LIMIT :limit;
+                    """)
+                        
+                    # Execute the query    
+                    result = session.execute(query, {"frequency": email_frequency, "limit": batch_size, "last_id": last_id})
+                        
+                    batch = [dict(row) for row in result.mappings()]
                     
-                result = session.execute(query, {"frequency": email_frequency, "limit": batch_size})
+                    if not batch:
+                        # No more records
+                        logger.info(f"All {email_frequency} users have been processed for today.")
+                        save_checkpoint(0)
+                        break
                     
-                batch = [dict(row) for row in result.mappings()]
-                
-                if not batch:
-                    # No more records
-                    logger.info("Daily automation: All users have been processed for today.")
-                    break
+                    last_id = batch[-1]['user_id']
 
-                yield batch   
+                    yield batch
 
-                batch_ids = [u['user_id'] for u in batch]
-                session.execute(
-                    text("UPDATE users SET last_email_sent_at = CURRENT_TIMESTAMP WHERE user_id IN :ids"),
-                    {"now": datetime.now(), "ids": tuple(batch_ids)}
-                )
-                session.commit()
+    except Exception as e:
+        logger.error(f"Database Fetch Error: Failed to retrieve batch after ID {last_id}. Error: {e}", exc_info=True)
+        raise
 
-                total_fetched += len(batch)
-                logger.info(f"Processed and updated {len(batch)} {email_frequency} users (Total so far: {total_fetched})")
-                    
-            except Exception as e:
-                session.rollback() # undo changes if update fails
-                logger.error(f"Error in daily batch: {e}", exc_info=True)
-                raise
+
+
+
+
+
+
+initialize_engine()
