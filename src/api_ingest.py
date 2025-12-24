@@ -5,11 +5,12 @@ from dotenv import load_dotenv
 from datetime import datetime
 from config.setup_config import logging_setup, API_LOG_PATH, OUTPUT_PATH
 
+load_dotenv()
+
 # logging config
 logger = logging_setup(API_LOG_PATH, __name__)
 
-load_dotenv()
-
+# Assign api url
 zq_today_api = os.getenv("API_URL")
 
 
@@ -24,10 +25,6 @@ def fetch_api_data(url=zq_today_api, api_timeout=10):
     Returns:
         dict | None: First quote object from API response containing 'q' (quote) 
                      and 'a' (author) keys, or None if request fails.
-    
-    Note:
-        ZenQuotes API returns an array with a single quote object. This function
-        extracts and returns only the first element.
     """
     try:
         logger.info(f"Fetch attempt from {url.split('/')[2]}")
@@ -40,7 +37,7 @@ def fetch_api_data(url=zq_today_api, api_timeout=10):
             except ValueError as e:
                 logger.error(f"Failed to parse JSON: {e}")
                 logger.error(f"Raw response: {response.text[:200]}")
-                return None
+                raise
             
             logger.info("Data successfully retrieved and parsed")
 
@@ -54,7 +51,7 @@ def fetch_api_data(url=zq_today_api, api_timeout=10):
         else:
             logger.error(f"Failed to retrieve data. Status code: {response.status_code}")
             logger.error(f"Response content: {response.text}")
-            return None
+            response.raise_for_status()
 
     except requests.exceptions.Timeout:
         logger.error(f"Request timed out.")
@@ -136,10 +133,6 @@ def cache_quote(filename=OUTPUT_PATH):
     Returns:
         dict | None: Quote data with 'quote', 'author', 'date', and 'fetched_at' keys
                      if valid cache exists and is from today, otherwise None.
-    
-    Note:
-        Cache is considered invalid if file is missing, corrupted, from a different
-        date, or missing required keys.
     """
     try:
         if not os.path.exists(filename):
@@ -149,7 +142,7 @@ def cache_quote(filename=OUTPUT_PATH):
         with open(filename, 'r') as file:
             cached_data = json.load(file)
 
-        # Validate cache structure
+        # Validate cache data structure
         required_keys = {'quote', 'author', 'date', 'fetched_at'}
         if not all(key in cached_data for key in required_keys):
             missing = required_keys - set(cached_data.keys())
