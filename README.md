@@ -152,7 +152,7 @@ CREATE TABLE users (
     email_address VARCHAR(255) NOT NULL UNIQUE,
     subscription_status VARCHAR(20) NOT NULL,
     email_frequency VARCHAR(10) NOT NULL,
-    last_sent_at TIMESTAMP,
+    last_email_sent_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
