@@ -27,10 +27,7 @@ This project is a robust Python-based email automation system for MindFuel (a me
 4. **Delivery** The email is delivered using SMTP and a feedback loop is set in place to update the database after each successful delivery.
 
 ## System Architecture Diagram
-<img width="2387" height="1555" alt="img1" src="https://github.com/user-attachments/assets/3f4d1cba-387d-429e-b7e3-e0a9c5205b54" />
-Note on the Feedback Loop: > * State Persistence: After each successful batch delivery, the system updates the pipeline_checkpoint.json with the current max_id.
-
-Database Synchronization: Upon delivery confirmation, the system writes back to the PostgreSQL database to update the last_sent_at timestamp for processed users, preventing duplicate sends.
+<img width="2532" height="1675" alt="Blank diagram" src="https://github.com/user-attachments/assets/61810ae7-e050-40bb-8d4b-c861eb21cf4b" />
 
 ## Project Structure
 
