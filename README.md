@@ -5,23 +5,29 @@
 - [Overview](#overview)
 - [Features](#features)
 - [System Architecture Diagram](#system-architecture-diagram)
+- [Project Workflow](#project-workflow)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
-- [Project Workflow](#project-workflow)
 - [Reproducibility Guide](#reproducibility-guide)
 - [Images from Successful Run](#images-from-sucessful-run)
 - [Logging](#logging)
 - [Error Handling](#error-handling)
 
 ## Overview
-This project is a robust Python-based email automation system for MindFuel (a mental health wellness startup). It fetches inspirational quotes from [ZenQuotes](https://zenquotes.io/) and delivers them to subscribers retrieved from a database via personalised emails. This system supports both daily and weekly subscription frequencies with comprehensive logging, error handling, and batch processing capabilities.
+This project is a Python-based automated email system for MindFuel (a mental health wellness startup). The project goal is to fetch inspirational quotes from the [ZenQuotes API](https://zenquotes.io/) and deliver personalised emails with the quote to users retrieved from a database daily, based on users' email subscription status and frequency.
 
 ## Features
-**MindFuel** is a four-stage automation system:
-1. **Ingestion** 
-  - **Quote Ingestion** (`fetch_quote.py`): Orchestrate the full ingestion workflow. It utilizes `api_ingest.py` to fetch daily inspirational quote from the [ZenQuotes API](https://docs.zenquotes.io/zenquotes-documentation/), formats the response, and caches it locally.
+This automated email system demonstrates production-grade data engineering practices with robust error handling, scalability considerations, and data quality assurance.
+
+1. **Data Ingestion and Quality** 
+  - **API Integration** onnects to the Zenquotes API  (`/today` endpoint) to retrieve daily motivational quotes.
     - **The exact API endpoint used is `https://zenquotes.io/api/today/[your_key]`** with key being optional.
-  - **User Retrieval** (`db_conn.py`): Connect to a PostgreSQL database and fetch users based on their subscription frequency (i.e daily/weekly). Uses a generator to process users in batch from the database.
+  - **Data Validation and Quality Checks:**
+    - Parses and validates API response
+      - Empty response detection
+      - Missou ransformed data to a local JSON file for downstream use.
+    - Implements data freshness check by comparing ingestion timestamp against the current date.
+    - Triggers API re-fetch only when data is stale, reducing redundant calls.
 2. **Staging & State Management**: Save the formatted data from the API as `quote_data.json`. To ensure redundant calls are not made to the API even when the script is run multiple times on the same day. In this layer, there's a watermark tracker `max_id` stored in `pipeline_checkpoint.json` to track progress. This ensures that if there's a system crash/failure, the pipeline resumes form the last successful user rather than restarting the batch.
 3. **Processing** (`process.py`): Send personalised emails to subscribers with the day's quote for each batch of users retrieved from the database. The email template supports HTML and plain templates using Jinja to render supported values. supporting both daily and weekly delivery schedules.
 4. **Delivery** The email is delivered using SMTP and a feedback loop is set in place to update the database after each successful delivery.
