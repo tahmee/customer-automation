@@ -6,15 +6,18 @@
 - [Features](#features)
 - [System Architecture Diagram](#system-architecture-diagram)
 - [Project Workflow](#project-workflow)
+- [Weekly Subscriber Logic](#weekly-subscriber-logic)
 - [Project Structure](#project-structure)
+- [Technical Stack](#technical-stack)
 - [Prerequisites](#prerequisites)
-- [Reproducibility Guide](#reproducibility-guide)
-- [Images from Successful Run](#images-from-sucessful-run)
+- [Setup Guide](#setup-guide)
 - [Logging](#logging)
 - [Error Handling](#error-handling)
+- [Deployment and Scheduling](#deployment-and-scheduling)
+- [Images from Successful Run](#images-from-sucessful-run)
 
 ## Overview
-This project is a Python-based automated email system for MindFuel (a mental health wellness startup). The project goal is to fetch inspirational quotes from the [ZenQuotes API](https://zenquotes.io/) and deliver personalised emails with the quote to users retrieved from a database daily, based on users' email subscription status and frequency.
+This project is a Python-based email automation system for MindFuel (a mental health wellness startup) that fetches motivational quotes from the [ZenQuotes API](https://zenquotes.io/), and delivers them as personalised emails to subscribed users.
 
 ## Features
 This automated email system demonstrates production-grade data engineering practices with robust error handling, scalability considerations, and data quality assurance.
