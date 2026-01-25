@@ -20,20 +20,22 @@
 This project is a Python-based email automation system for MindFuel (a mental health wellness startup) that fetches motivational quotes from the [ZenQuotes API](https://zenquotes.io/), and delivers them as personalised emails to subscribed users.
 
 ## Features
-This automated email system demonstrates production-grade data engineering practices with robust error handling, scalability considerations, and data quality assurance.
-
-1. **Data Ingestion and Quality** 
-  - **API Integration** onnects to the Zenquotes API  (`/today` endpoint) to retrieve daily motivational quotes.
-    - **The exact API endpoint used is `https://zenquotes.io/api/today/[your_key]`** with key being optional.
-  - **Data Validation and Quality Checks:**
-    - Parses and validates API response
-      - Empty response detection
-      - Missou ransformed data to a local JSON file for downstream use.
-    - Implements data freshness check by comparing ingestion timestamp against the current date.
-    - Triggers API re-fetch only when data is stale, reducing redundant calls.
-2. **Staging & State Management**: Save the formatted data from the API as `quote_data.json`. To ensure redundant calls are not made to the API even when the script is run multiple times on the same day. In this layer, there's a watermark tracker `max_id` stored in `pipeline_checkpoint.json` to track progress. This ensures that if there's a system crash/failure, the pipeline resumes form the last successful user rather than restarting the batch.
-3. **Processing** (`process.py`): Send personalised emails to subscribers with the day's quote for each batch of users retrieved from the database. The email template supports HTML and plain templates using Jinja to render supported values. supporting both daily and weekly delivery schedules.
-4. **Delivery** The email is delivered using SMTP and a feedback loop is set in place to update the database after each successful delivery.
+### 1. **API Integration** 
+Connects to the Zenquotes API  (`/today` endpoint) to retrieve daily motivational quotes, transforms the API response, and persists the data locally with caching to avoid redundant API calls.
+### 2. **Database Integration**: 
+Connects to a PostgreSQL database using SQLAlchemy and retrieves users in batches based on their email frequency preference (daily or weekly) and subscription status (active).
+### 3. **Email Processing and Delivery** 
+Uses Jinja2 templating to generate personalized HTML emails for each user. Each email includes the user's name, the daily quote, and author attribution that is then delivered using the SMTP server.
+### 4. **Logging and Monitoring** 
+Implements a detailed logging system with separate log files for API operations, email processing, and summary statistics. All actions, errors, and performance metrics are captured to ensure effective debugging and monitoring.
+### 5. **Error Handling and Admin Alerting** 
+Features robust error handling Triggers critical alerts on pipeline failures and sends summary reports on successful runs to admin via email. 
+### 6. **Idempotency and Recovery** 
+Maintains a checkpoint system that tracks the last successfully processed user ID, allowing the system to resume from the point of failure without sending duplicate emails.
+### 6. **Database Integrity with Transaction Management** 
+Ensures all database updates and activity use commit and rollback to ensure transactions are fully committed on success or rolled back on failure to maintain data consistency and integrity.
+### 6. **Rate Limiting** 
+Implements a 0.1-second delay between email sends (10 emails/second maximum) to comply with SMTP server rate limits and avoid emails being flagged as spam or sender getting blacklisted.
 
 ## System Architecture Diagram
 <img width="2532" height="1675" alt="Blank diagram" src="https://github.com/user-attachments/assets/61810ae7-e050-40bb-8d4b-c861eb21cf4b" />
