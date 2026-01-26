@@ -157,6 +157,19 @@ Calculates and logs:
 - **Failure Alerts:** Triggered on critical errors.
 - Alert emails include formatted reports with timestamp, status, statistics, breakdown, and performance metrics
 
+## Weekly Subscriber Logic
+
+The system processes weekly subscribers only on Mondays. This logic is implemented in the main orchestration script:
+
+```python
+if day_name == "Monday":
+    # Process weekly subscribers
+else:
+    # Skip weekly subscribers
+```
+
+Users with `email_frequency = 'weekly'` receive quotes once per week, while `email_frequency = 'daily'` users receive quotes every day.
+
 ## Project Structure
 
 ```
@@ -196,13 +209,14 @@ customer-automation/
 └── README.md              # This file
 ```
 
-## Prerequisites
+## Technical Stack
 
-### System Requirements
-- Python 3.8 or higher
-- PostgreSQL (local instance) or any local/cloud based database
-- SMTP server access (e.g., Gmail)
-- Internet connection for API access
+- **Language:** Python 3.12.4
+- **Database:** PostgreSQL
+- **Email:** SMTP with Python `smtplib` and `email.mime`
+- **Templating:** Jinja2, HTML
+- **Configuration:** python-dotenv for environment variables
+- **Logging:** Python `logging` module
 
 ## Reproducibility Guide
 
