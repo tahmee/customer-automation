@@ -218,7 +218,7 @@ customer-automation/
 - **Configuration:** python-dotenv for environment variables
 - **Logging:** Python `logging` module
 
-## Reproducibility Guide
+## Setup Guide
 
 This section provides step-by-step instructions to reproduce the exact environment and run the system from scratch.
 
