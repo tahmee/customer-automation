@@ -18,21 +18,21 @@
 This project is a Python-based email automation system for MindFuel (a mental health wellness startup) that fetches motivational quotes from the [ZenQuotes API](https://zenquotes.io/), and delivers them as personalised emails to subscribed users.
 
 ## Features
-#### **API Integration** 
+- #### **API Integration** 
 Connects to the Zenquotes API  (`/today` endpoint) to retrieve daily motivational quotes, transforms the API response, and persists the data locally with caching to avoid redundant API calls.
-#### **Database Integration**: 
+- #### **Database Integration**: 
 Connects to a PostgreSQL database using SQLAlchemy and retrieves users in batches based on their email frequency preference (daily or weekly) and subscription status (active).
-#### **Email Processing and Delivery** 
+- #### **Email Processing and Delivery** 
 Uses Jinja2 templating to generate personalized HTML emails for each user. Each email includes the user's name, the daily quote, and author attribution that is then delivered using the SMTP server.
-#### **Logging and Monitoring** 
+- #### **Logging and Monitoring** 
 Implements a detailed logging system with separate log files for API operations, email processing, and summary statistics. All actions, errors, and performance metrics are captured to ensure effective debugging and monitoring.
-#### **Error Handling and Admin Alerting** 
+- #### **Error Handling and Admin Alerting** 
 Features robust error handling Triggers critical alerts on pipeline failures and sends summary reports on successful runs to admin via email. 
-#### **Idempotency and Recovery** 
+- #### **Idempotency and Recovery** 
 Maintains a checkpoint system that tracks the last successfully processed user ID, allowing the system to resume from the point of failure without sending duplicate emails.
-#### **Database Integrity with Transaction Management** 
+- #### **Database Integrity with Transaction Management** 
 Ensures all database updates and activity use commit and rollback to ensure transactions are fully committed on success or rolled back on failure to maintain data consistency and integrity.
-#### **Rate Limiting** 
+- #### **Rate Limiting** 
 Implements a 0.1-second delay between email sends (10 emails/second maximum) to comply with SMTP server rate limits and avoid emails being flagged as spam or sender getting blacklisted.
 
 ## System Architecture Diagram
