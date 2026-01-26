@@ -420,7 +420,7 @@ The system is designed to be scheduled via cron for automated daily execution. T
 <img width="1062" height="168" alt="image2" src="https://github.com/user-attachments/assets/18d60307-f1fb-497a-806a-4f686014c486" />
 <img width="930" height="243" alt="image3" src="https://github.com/user-attachments/assets/55f1513b-1d8d-4391-b01e-493a05b93d39" />
 <img width="820" height="261" alt="image4" src="https://github.com/user-attachments/assets/8a764fbd-7967-4499-b03e-06e8fb018a87" />
-![image5](https://github.com/user-attachments/assets/a718c6e4-6787-494f-b05b-64d75f0fe444)
+<img width="419" height="486" alt="image5" src="https://github.com/user-attachments/assets/d8da74a3-00a7-4fed-aff7-c8edb720fcfa" />
 
 ## Contact
 For suggestions/ideas on improvement for this project or issues encountered during reproduction of this project please reach out to me on [LinkedIn](https://www.linkedin.com/in/susanamgbare/). I look forward to connecting, and having a chat.
