@@ -20,25 +20,142 @@
 This project is a Python-based email automation system for MindFuel (a mental health wellness startup) that fetches motivational quotes from the [ZenQuotes API](https://zenquotes.io/), and delivers them as personalised emails to subscribed users.
 
 ## Features
-### 1. **API Integration** 
+#### **API Integration** 
 Connects to the Zenquotes API  (`/today` endpoint) to retrieve daily motivational quotes, transforms the API response, and persists the data locally with caching to avoid redundant API calls.
-### 2. **Database Integration**: 
+#### **Database Integration**: 
 Connects to a PostgreSQL database using SQLAlchemy and retrieves users in batches based on their email frequency preference (daily or weekly) and subscription status (active).
-### 3. **Email Processing and Delivery** 
+#### **Email Processing and Delivery** 
 Uses Jinja2 templating to generate personalized HTML emails for each user. Each email includes the user's name, the daily quote, and author attribution that is then delivered using the SMTP server.
-### 4. **Logging and Monitoring** 
+#### **Logging and Monitoring** 
 Implements a detailed logging system with separate log files for API operations, email processing, and summary statistics. All actions, errors, and performance metrics are captured to ensure effective debugging and monitoring.
-### 5. **Error Handling and Admin Alerting** 
+#### **Error Handling and Admin Alerting** 
 Features robust error handling Triggers critical alerts on pipeline failures and sends summary reports on successful runs to admin via email. 
-### 6. **Idempotency and Recovery** 
+#### **Idempotency and Recovery** 
 Maintains a checkpoint system that tracks the last successfully processed user ID, allowing the system to resume from the point of failure without sending duplicate emails.
-### 6. **Database Integrity with Transaction Management** 
+#### **Database Integrity with Transaction Management** 
 Ensures all database updates and activity use commit and rollback to ensure transactions are fully committed on success or rolled back on failure to maintain data consistency and integrity.
-### 6. **Rate Limiting** 
+#### **Rate Limiting** 
 Implements a 0.1-second delay between email sends (10 emails/second maximum) to comply with SMTP server rate limits and avoid emails being flagged as spam or sender getting blacklisted.
 
 ## System Architecture Diagram
 <img width="2532" height="1675" alt="Blank diagram" src="https://github.com/user-attachments/assets/61810ae7-e050-40bb-8d4b-c861eb21cf4b" />
+
+## Project Workflow
+
+### 1. ETL Pipeline (Quote Retrieval)
+
+**Data Extraction:**
+- Connects to the ZenQuotes API using the `requests` library.
+- Includes a retry logic with exponential backoff (a maximum of 3 attempts).
+- Implements a 10-second timeout for API calls
+
+**Data Validation:**
+- Parses the API response as JSON.
+- Validates that required keys ('q' for quote, 'a' for author) are present and non-empty.
+- Logs malformed or incomplete data and halts processing if validation fails.
+
+**Data Transformation:**
+- Maps shorthand API keys to descriptive names: `'q'` → `'quote'`, `'a'` → `'author'`
+- Enriches data with metadata (ingestion timestamps): current date and ISO timestamp.
+- Structures data as: `{'quote': str, 'author': str, 'date': 'YYYY-MM-DD', 'fetched_at': ISO_timestamp}`
+
+**Data Loading:**
+- Persists transformed data to a local JSON file (`quote_data.json`).
+- Implements file permission and OS error handling.
+
+**Cache Mechanism:**
+- Uses cached data if fresh, avoiding redundant API calls regardless of how many times the script runs in a day.
+- Before making API calls, performs a check if a valid quote for today already exists.
+- Validates cached data structure (all required keys present)
+- Performs freshness check by comparing the cached date with today's date.
+
+### 2. Database Connection and User Retrieval
+
+**Connection Initialization:**
+- Establishes a database engine using SQLAlchemy with `pool_pre_ping=True` for connection health checks.
+- Connection is initialized automatically when the `db_conn` module is imported.
+
+**Batch Processing with Generator:**
+- Uses a Python generator function to retrieve users in batches (default: 1000 records per batch).
+- Processes one batch at a time to manage memory efficiently for large users.
+
+**User Selection Criteria:**
+Users are retrieved based on the following SQL conditions:
+- `subscription_status = 'active'`
+- `email_frequency` matches the requested type ('daily' or 'weekly').
+- `user_id > last_processed_id` (ensures resumption from checkpoint).
+- `last_email_sent_at < CURRENT_DATE OR last_email_sent_at IS NULL` (prevents duplicate sends on the same day).
+
+**Checkpoint Mechanism:**
+- Tracks the last processed `user_id` in a JSON checkpoint file.
+- After each successful batch, updates the checkpoint with the highest `user_id` processed.
+- On pipeline restart, resumes from the last checkpoint to avoid reprocessing users.
+- Resets checkpoint to 0 when all users for the day have been processed.
+
+### 3. Email Template Rendering and Delivery
+
+**Template Processing:**
+- Uses Jinja2 to render both HTML and plain text email versions.
+- Personalizes each email by injecting: `user's name`, `quote`, and `author` in email template.
+
+**SMTP Configuration:**
+- Opens a single SMTP connection per batch for efficiency.
+- Implements TLS encryption with `server.starttls()`
+- Authenticates with sender credentials before sending.
+
+**Email Structure:**
+- Uses MIME multipart messages to successfully create complex email body such as the HTML version..
+- Includes both plain text and HTML versions for email client compatibility. 
+
+**Retry Logic:**
+- Each email has up to 3 send attempts with exponential backoff (2s, 4s, 8s).
+- Tracks successful and failed email sends separately.
+- Only users with successful email delivery are marked for database update.
+
+**Rate Limiting:**
+- Implements a 0.1-second delay between batch completions to not exceed SMTP provider limits.
+
+### 4. Database Update and Feedback Loop
+
+**Transactional Updates:**
+- After each batch is fully processed, performs a bulk database update.
+- Updates `last_email_sent_at` to `CURRENT_TIMESTAMP` for all users with successful email delivery.
+- Uses SQLAlchemy's `session.commit()` to persist changes.
+
+**Rollback Strategy:**
+- If database update fails, calls `session.rollback()` to undo uncommitted changes, this also ensures data integrity by never leaving partial updates in the database.
+- Re-raises the exception to halt further processing and trigger admin alert.
+
+**Checkpoint Update:**
+- Updates checkpoint file only after successful database commit.
+- Stores the highest `user_id` from the successfully processed batch.
+- Enables exact resumption if the next batch fails.
+
+### 5. Logging, Monitoring, and Admin Alerts
+
+**Logging Architecture:**
+- **API Log:** Captures all operations involving API calls, cache, and save operations.
+- **Main Log:** Records email processing, batch operations, database interactions, and SMTP activities.
+- **Summary Log:** Stores high-level statistics and performance metrics.
+
+**Statistics Tracking:**
+Maintains real-time counters for:
+- `records_processed`: Total users processed.
+- `emails_sent`: Successfully delivered emails.
+- `failed`: Failed email attempts.
+- `daily`: Count of daily subscribers processed.
+- `weekly`: Count of weekly subscribers processed (Mondays only).
+
+**Performance Metrics:**
+Calculates and logs:
+- Success rate: `(emails_sent / records_processed) × 100`
+- Duration: Total execution time in seconds and minutes.
+- Throughput: `emails_sent / duration` (emails per second).
+
+**Admin Alerting:**
+- **Success Reports:** Sent after every successful run with complete statistics.
+- **Failure Alerts:** Triggered on critical errors.
+- Alert emails include formatted reports with timestamp, status, statistics, breakdown, and performance metrics
 
 ## Project Structure
 
@@ -86,28 +203,6 @@ customer-automation/
 - PostgreSQL (local instance) or any local/cloud based database
 - SMTP server access (e.g., Gmail)
 - Internet connection for API access
-
-## Project Workflow
-
-### Quote Ingestion & Caching
-- 
-  - API Integration: The system connects to the ZenQuotes API using the today API endpoint, to fetch the daily inspirational quote.
-  - Local persistence: The formatted API response in stored into a local JSON file (`quote_data.json`) to reduce external dependencies during the distribution phase.
-  - Cache validation: This mechanism checks the timestamp of the cached quote against the API’s refresh cycle. If a valid quote for the current period exists locally, the system bypasses the API call and uses the cached version.
-
-### ETL & Email Delivery Process
-- When the distribution pipeline is triggered via main.py (utilizing `process.py`):
-  - The system establishes a secure connection to PostgreSQL. It filters subscribed users based on their frequency preference (i.e daily/weekly - where weekly is scheduled to receive quote only on mondays) and other logic like last_email_sent_at column being less than the current date or null.
-  - The cached quote data is loaded. 
-  - Using Jinja templates, the system performs a 'Mail Merge' logic, injecting the user's name and the daily quote text and author name into email.html and plain email text. This is to ensure emails are personalised per user.
-  - The system authenticates with the SMTP server and delivers the personalised emails in batches.
-
-### The Feedback Loop:
-- State Persistence: After each successful batch, the system updates pipeline_checkpoint.json with the current max_id. This ensures that if a crash occurs, the pipeline can resume from the last processed user.
-- Database Synchronization: Upon delivery confirmation, the system writes back to PostgreSQL to update the last_email_sent_at timestamp, preventing duplicate sends in the next cycle.
-
-### Automation (Cron)
-- Configured a cron job to run `fetch_quote.py` daily at 6:00am and `main.py` daily at 7:00am.
 
 ## Reproducibility Guide
 
