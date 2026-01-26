@@ -9,10 +9,8 @@
 - [Weekly Subscriber Logic](#weekly-subscriber-logic)
 - [Project Structure](#project-structure)
 - [Technical Stack](#technical-stack)
-- [Prerequisites](#prerequisites)
 - [Setup Guide](#setup-guide)
 - [Logging](#logging)
-- [Error Handling](#error-handling)
 - [Deployment and Scheduling](#deployment-and-scheduling)
 - [Images from Successful Run](#images-from-sucessful-run)
 
@@ -359,13 +357,6 @@ Add the following lines:
 0 7 * * * cd /path/to/customer-automation && /path/to/venv/bin/python main.py >> logs/cron.log 2>&1
 ```
 
-## Images From Sucessful Run
-<img width="1273" height="1481" alt="img3" src="https://github.com/user-attachments/assets/ecec0bac-73eb-4113-aa23-b04e89748e05" />
-<img width="1153" height="488" alt="Screenshot 2025-11-13 at 8 46 48 AM" src="https://github.com/user-attachments/assets/173150cc-4a09-4f46-b10f-fe9814afb9d9" />
-<img width="1280" height="633" alt="PHOTO-2025-11-13-08-52-33" src="https://github.com/user-attachments/assets/ce0a8ae9-204d-40a8-a610-796fa3e48a02" />
-<img width="865" height="427" alt="Screenshot 2025-11-13 at 8 48 45 AM" src="https://github.com/user-attachments/assets/866e1f1b-d6d2-4994-be7b-7690e8438883" />
-<img width="796" height="1280" alt="PHOTO-2025-11-13-08-55-41" src="https://github.com/user-attachments/assets/d29bddea-bb60-4bce-a84c-ae2513de501a" />
-
 ## Logging
 
 ### Log Files
@@ -418,6 +409,20 @@ Add the following lines:
 2025-11-12 07:15:30 - Throughput: 27.64 emails/second
 ```
 
+## Deployment and Scheduling
+
+The system is designed to be scheduled via cron for automated daily execution. The exit codes enable monitoring:
+- Exit code 0: Successful execution
+- Exit code 1: Critical failure (triggers cron notification)
+
+## Images From Sucessful Run
+<img width="1273" height="1481" alt="img3" src="https://github.com/user-attachments/assets/ecec0bac-73eb-4113-aa23-b04e89748e05" />
+<img width="1153" height="488" alt="Screenshot 2025-11-13 at 8 46 48 AM" src="https://github.com/user-attachments/assets/173150cc-4a09-4f46-b10f-fe9814afb9d9" />
+<img width="1280" height="633" alt="PHOTO-2025-11-13-08-52-33" src="https://github.com/user-attachments/assets/ce0a8ae9-204d-40a8-a610-796fa3e48a02" />
+<img width="865" height="427" alt="Screenshot 2025-11-13 at 8 48 45 AM" src="https://github.com/user-attachments/assets/866e1f1b-d6d2-4994-be7b-7690e8438883" />
+<img width="796" height="1280" alt="PHOTO-2025-11-13-08-55-41" src="https://github.com/user-attachments/assets/d29bddea-bb60-4bce-a84c-ae2513de501a" />
+
 ## Contact
 For suggestions/ideas on improvement for this project or issues encountered during reproduction of this project please reach out to me on [LinkedIn](https://www.linkedin.com/in/susanamgbare/). I look forward to connecting, and having a chat.
   
+
