@@ -418,25 +418,6 @@ Add the following lines:
 2025-11-12 07:15:30 - Throughput: 27.64 emails/second
 ```
 
-## Error Handling
-
-### 1. Retry Mechanism
-
-The system implements exponential backoff for failed email sends:
-
-- **Attempt 1**: Immediate
-- **Attempt 2**: Wait 2 seconds
-- **Attempt 3**: Wait 4 seconds (2^2)
-
-### 2. Alert System
-
-Administrator receive email alerts for:
-- Script completion with statistics
-- Critical failures
-- Database connection issues
-- Abnormally high failure rates
-
-
 ## Contact
 For suggestions/ideas on improvement for this project or issues encountered during reproduction of this project please reach out to me on [LinkedIn](https://www.linkedin.com/in/susanamgbare/). I look forward to connecting, and having a chat.
   
