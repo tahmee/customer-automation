@@ -416,11 +416,11 @@ The system is designed to be scheduled via cron for automated daily execution. T
 - Exit code 1: Critical failure (triggers cron notification)
 
 ## Images From Sucessful Run
-<img width="1273" height="1481" alt="img3" src="https://github.com/user-attachments/assets/ecec0bac-73eb-4113-aa23-b04e89748e05" />
-<img width="1153" height="488" alt="Screenshot 2025-11-13 at 8 46 48 AM" src="https://github.com/user-attachments/assets/173150cc-4a09-4f46-b10f-fe9814afb9d9" />
-<img width="1280" height="633" alt="PHOTO-2025-11-13-08-52-33" src="https://github.com/user-attachments/assets/ce0a8ae9-204d-40a8-a610-796fa3e48a02" />
-<img width="865" height="427" alt="Screenshot 2025-11-13 at 8 48 45 AM" src="https://github.com/user-attachments/assets/866e1f1b-d6d2-4994-be7b-7690e8438883" />
-<img width="796" height="1280" alt="PHOTO-2025-11-13-08-55-41" src="https://github.com/user-attachments/assets/d29bddea-bb60-4bce-a84c-ae2513de501a" />
+<img width="1273" height="1481" alt="image1" src="https://github.com/user-attachments/assets/b367e621-dd3f-4c17-b09b-a22ab4163b64" />
+<img width="1062" height="168" alt="image2" src="https://github.com/user-attachments/assets/18d60307-f1fb-497a-806a-4f686014c486" />
+<img width="930" height="243" alt="image3" src="https://github.com/user-attachments/assets/55f1513b-1d8d-4391-b01e-493a05b93d39" />
+<img width="820" height="261" alt="image4" src="https://github.com/user-attachments/assets/8a764fbd-7967-4499-b03e-06e8fb018a87" />
+![image5](https://github.com/user-attachments/assets/a718c6e4-6787-494f-b05b-64d75f0fe444)
 
 ## Contact
 For suggestions/ideas on improvement for this project or issues encountered during reproduction of this project please reach out to me on [LinkedIn](https://www.linkedin.com/in/susanamgbare/). I look forward to connecting, and having a chat.
