@@ -14,11 +14,11 @@ logger=logging_setup(AppConfig.LOG_PATH, __name__)
 SCRIPT_DIR = Path(__file__).parent
 TEMPLATE_DIR = SCRIPT_DIR.parent / 'templates'
 
-# Retry logic for SMTP stability
+# Retry logic for SMTP 
 MAX_RETRIES = 3
 RETRY_DELAY = 2  # seconds 
 
-# Initialize Jinja Environment to load both HTML and Plain Text templates
+# Initialize Jinja Environment 
 env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 
 def email_template(recipient_name, quote, author):
