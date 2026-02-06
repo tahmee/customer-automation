@@ -89,7 +89,7 @@ def save_api_data(data, filename=OUTPUT_PATH):
         quote = data.get('q')
         author = data.get('a')
 
-        # Emsure partly missing or malformed data is not saved
+        # Emsure missing or malformed data is not saved
         if not quote or not author:
             logger.error(
                 f"Malformed quote data: 'q' or 'a' key missing or value is empty. "
@@ -106,10 +106,10 @@ def save_api_data(data, filename=OUTPUT_PATH):
             'fetched_at': now.isoformat()
         }
 
-        # Log a snippet of the quote for verification
+        # Log a snippet of the quote
         logger.info(f"Today's quote: '{quote[:50]}...' by {author}")
         
-        # Save to local disk with indentation for readability
+        # Save to local disk with proper indentation for readability
         with open(filename, 'w') as file:
             json.dump(formatted_quote, file, indent=2, ensure_ascii=False)
             logger.info(f"Quote successfully saved to {filename.split('/')[1]}")
@@ -130,7 +130,7 @@ def cache_quote(filename=OUTPUT_PATH):
     """
     Checks if a valid, up-to-date quote already exists on disk.
     
-    This function helps avoid unnecessary API calls (rate limiting) if the script 
+    This function helps avoid unnecessary API calls if the script 
     is run multiple times on the same day.
 
     Args:
