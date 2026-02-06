@@ -3,8 +3,9 @@ import time
 from config.setup_config import logging_setup, API_LOG_PATH, api_dirs
 from src.api_ingest import fetch_api_data, cache_quote, save_api_data        
 
-# Logging & Retry Configuration
+# Logging config
 logger = logging_setup(API_LOG_PATH, __name__)
+
 # Number of times to re-attempt the API call before giving up
 MAX_RETRIES=3
 
@@ -48,7 +49,7 @@ def main():
                 logger.warning(f"Attempt {attempt + 1} retrying...")
                 time.sleep(wait)
                 
-        # Post-Fetch Validation
+        # Post-fetch Validation
         if not api_data: 
             logger.error(f"Failed to fetch data after {MAX_RETRIES} retries")
             raise RuntimeError("API fetch failed")
