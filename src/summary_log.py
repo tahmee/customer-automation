@@ -2,7 +2,7 @@ from datetime import datetime
 from config.setup_config import logging_setup, AppConfig
 
 
-# Logging config - This uses a separate log path (summary.log) to keep high-level reports 
+# Logging config - This uses a separate log path (summary.log)  
 summary_logger = logging_setup(AppConfig.SUMMARY_LOG_PATH, __name__)
 
 def generate_summary(stats, day_name, duration, success=True):
@@ -23,7 +23,7 @@ def generate_summary(stats, day_name, duration, success=True):
         str: A multi-line, plain-text report.
     """
     total = stats['records_processed']
-    # Calculate percentage of success, avoiding division by zero
+    # Calculate percentage of success
     success_rate = (stats['emails_sent'] / total * 100) if total > 0 else 0
     
     # Construct the report
@@ -58,8 +58,7 @@ def log_final_summary(stats, day_name, duration):
     """
     Persists the execution results to the 'summary.log' file.
 
-    This fuction is for long-term tracking of the pipeline's performance 
-    and subscriber growth.
+    This fuction is for long-term tracking of the pipeline's performance.
 
     Args:
         stats (dict): The shared statistics dictionary.
