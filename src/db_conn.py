@@ -5,8 +5,9 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from config.setup_config import logging_setup, AppConfig
 
-# Logging & Batch Config
+# Logging config
 logger=logging_setup(AppConfig.LOG_PATH, __name__)
+
 # Determines how many user records are pulled into memory at once
 CHUNK_SIZE = 1000
 
@@ -46,7 +47,7 @@ def get_last_processed_id():
     if os.path.exists(AppConfig.CHECKPOINT_FILE):
         try:
             with open(AppConfig.CHECKPOINT_FILE, 'r') as f:
-                # Retrieve the persistent user_id required for pipeline continuity
+                # Retrieve the persistent user_id required to continue the pipeline
                 return json.load(f).get('max_id', 0)
         except Exception: return 0
     return 0
@@ -71,7 +72,7 @@ def fetch_users_in_batches(email_frequency, batch_size=CHUNK_SIZE):
     This function uses uses the database connection to retrieve subscribed users from the database is batches.
 
     Args:
-        email_frequency (str): Filter for user preference (e.g., 'daily', 'weekly').
+        email_frequency (str): Filter for user preference (e.g. 'daily', 'weekly').
         batch_size (int, optional): Number of records per batch. Defaults to CHUNK_SIZE.
 
     Yields:
