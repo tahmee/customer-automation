@@ -11,10 +11,10 @@ from config.setup_config import EmailConfig, AppConfig, logging_setup
 #logging config
 logger = logging_setup(AppConfig.LOG_PATH, __name__)
 
-# Define the base directory of the current script (project/utils/email_script.py -> project/utils)
+# Define the base directory of this script 
 SCRIPT_DIR = Path(__file__).parent
 
-# Define the template directory (project/templates)
+# Define the template directory
 TEMPLATE_DIR = SCRIPT_DIR.parent / 'templates'
 
 # Setup Jinja Environment 
@@ -22,13 +22,12 @@ env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 
 def send_alert_email(summary_text, subject="MindFuel Email Automation Summary"):
     """
-    Sends a multipart (Plain Text + HTML) alert email to the configured administrator.
+    Sends a multipart (Plain Text + HTML) alert email to the admin.
 
-    This function uses SMTP to send a summary report. It renders an HTML template 
-    using Jinja2 and falls back to plain text for email clients that do not support HTML.
+    This function uses SMTP to send a summary report. 
 
     Args:
-        summary_text (str): The raw text data/statistics to include in the email.
+        summary_text (str): The raw text data(statistics) to include in the email.
         subject (str, optional): The subject line of the email. 
             Defaults to "MindFuel Email Automation Summary".
 
@@ -40,7 +39,7 @@ def send_alert_email(summary_text, subject="MindFuel Email Automation Summary"):
         logger.info("Alert emails disabled (SEND_ALERTS=false)")
         return False
     
-    # Verify that a recipient email address has been provided
+    # Verify that recipient email address is provided
     if not AppConfig.ALERT_EMAIL:
         logger.warning("ALERT_EMAIL not configured, skipping alert email")
         return False
@@ -56,7 +55,7 @@ def send_alert_email(summary_text, subject="MindFuel Email Automation Summary"):
         message['To'] = AppConfig.ALERT_EMAIL
         message['Subject'] = subject
         
-        # Attach both versions (Plain text must be attached first)
+        # Attach both versions of text (html and plain)
         message.attach(MIMEText(summary_text, 'plain'))
         message.attach(MIMEText(html_content, 'html'))
 
