@@ -9,8 +9,8 @@ from src.db_conn import save_checkpoint
 # Logging config
 logger = logging_setup(AppConfig.LOG_PATH, __name__)
 
-# RATE_LIMIT_DELAY prevents being flagged as spam by the SMTP provider
-RATE_LIMIT_DELAY = 0.1  # seconds between emails (10 emails per second maximum throughput)
+# seconds between emails 
+RATE_LIMIT_DELAY = 0.1  
 
 
 def get_quote(filename):
@@ -79,20 +79,20 @@ def process_user_batch(batch, quote, author, stats, session):
                     stats['failed'] += 1 
                     logger.warning(f"Failed to send email to {email}: {e}")
 
-            # Minor sleep to adhere SMTP rate limits
+            #sleep to adhere SMTP rate limits
             time.sleep(RATE_LIMIT_DELAY)
 
         # Database Update: Only update records for users who successfully received the email
         if successful_ids:
             try:
-                # Bulk update last_email_sent_at to prevent duplicate emails today
+                # Bulk update last_email_sent_at to prevent duplicate emails same day
                 session.execute(
                     text("UPDATE users SET last_email_sent_at = CURRENT_TIMESTAMP WHERE user_id IN :ids"),
                     {"ids": tuple(successful_ids)}
                 )
                 session.commit() # Save the final changes to the database.
 
-                # Update the max_id checkpoint after successful database update so as to resume from if the NEXT batch fails
+                # Update the max_id checkpoint after successful database update so as to resume from if the next batch fails
                 save_checkpoint(successful_ids[-1])
                 logger.info(f"Batch complete. Updated {len(successful_ids)} records in DB.")
 
