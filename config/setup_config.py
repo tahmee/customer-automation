@@ -8,7 +8,7 @@ load_dotenv()
 # Global directory setup
 LOG_DIR = "logs"
 OUTPUT_DIR = "api_data"
-
+ 
 # Ensure essential directories exist
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -42,7 +42,7 @@ class EmailConfig:
 
 class AppConfig:  
     """
-    Centralised application settings including database credentials and alert toggle.
+    System settings including database credentials and alert toggle.
     
     Attributes:
         DB_CREDENTIALS (str): Connection string for the database.
@@ -67,7 +67,7 @@ class AppConfig:
 
 def api_dirs():
     """
-    Creates the necessary directory structure for the application.
+    Creates the necessary directory structure for the system.
     
     This function ensures that the 'logs' and 'api_data' folders exist 
     to prevent FileNotFoundError.
@@ -104,7 +104,7 @@ def logging_setup(log_path, module_name):
         # Add handler to logger
         logger.addHandler(file_handler)
         
-        # Prevent logs from being passed up to the root logger to avoid double logging in console
+        # Prevent logs from being passed up to the root logger to avoid double logging
         logger.propagate = False
 
     return logger
