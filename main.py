@@ -7,12 +7,12 @@ from src.db_conn import fetch_users_in_batches, Session
 from src.summary_log import generate_summary, log_final_summary
 from src.alerts import send_alert_email
 
-# Setup specialised loggers
+# logging config
 logger = logging_setup(AppConfig.LOG_PATH, "ORCHESTRATOR")
 
 def main():
     """
-    The main execution entry point for the MindFuel Email Automation system.
+    The main execution entry point for the system.
     
     This function coordinates the end-to-end workflow:
     1. Validates environment and loads the daily quote.
@@ -24,6 +24,7 @@ def main():
     # Ensure directories exist
     api_dirs()
     
+    #setup datetime
     start_time = time.time()
     day_name = datetime.now().strftime("%A")
     
